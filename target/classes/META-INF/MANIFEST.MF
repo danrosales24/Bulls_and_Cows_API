@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Built-By: Danny
+Build-Jdk: 15.0.1
+Implementation-Title: your-artifactId
+Implementation-Version: 1.0-SNAPSHOT
+Implementation-Vendor-Id: your.groupId
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-boot
+ -starter-parent/your-artifactId
+Created-By: Maven Integration for Eclipse
+
