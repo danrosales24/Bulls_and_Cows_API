@@ -2,6 +2,8 @@ package bulls_cows.todoapi.controllers;
 
 import bulls_cows.todoapi.data.gameDao;
 import bulls_cows.todoapi.models.game;
+import bulls_cows.todoapi.models.rounds;
+
 import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 public class gameController {
 
 	private final gameDao dao;
+	private rounds rounds;
 
 	public gameController(gameDao dao) {
 		this.dao = dao;
@@ -33,10 +36,24 @@ public class gameController {
 
 	@PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public game create(game game) {
+    public String create(game game) {
     	return dao.add(game);
    
 
     }
+
+	@PostMapping("/{id}/{guess}")
+	public ResponseEntity update(@PathVariable int id, @RequestBody game game) {
+	    ResponseEntity response = new ResponseEntity(HttpStatus.NOT_FOUND);
+		if (id != game.getgameId()) {
+	        response = new ResponseEntity(HttpStatus.UNPROCESSABLE_ENTITY);
+	    } else {
+	    	dao.roundadd(rounds, game);
+	    	response = new ResponseEntity(HttpStatus.ACCEPTED);
+	    }
+	    return response;
+	}
+
+
 
 }

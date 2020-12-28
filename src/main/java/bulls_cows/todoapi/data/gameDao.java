@@ -6,11 +6,15 @@ import java.util.List;
 
 public interface gameDao {
 
-    game add(game game);
+    String add(game game);
 
     List<game> getAll();
+    
+   rounds roundadd(rounds rounds, game game);
+    
+    List<rounds> getALL();
 
-   // game findBygameId(int id);
+    boolean update (game game);
     
     //rounds findByroundId(int id);
 

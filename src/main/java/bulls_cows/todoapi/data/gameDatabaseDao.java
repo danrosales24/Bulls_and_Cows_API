@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -31,7 +32,7 @@ public class gameDatabaseDao implements gameDao {
 
 	@Override
 	@Transactional
-	public game add(game game) {
+	public String add(game game) {
 
 		game.setanswer(game.random(game.getanswer()));
 
@@ -41,12 +42,13 @@ public class gameDatabaseDao implements gameDao {
 		game.setgameId(newId);
 
 		jdbcTemplate.update(INSERT_GAME, game.getanswer());
-		return game;
+
+		return game.begin(game);
 	}
 
 	@Override
 	public List<game> getAll() {
-		final String sql = "SELECT gameID,answer,isFinished FROM game;";
+		final String sql = "SELECT gameID,answer,isFinished FROM game WHERE isFinished IS NOT NULL ;";
 		return jdbcTemplate.query(sql, new gameMapper());
 	}
 
@@ -61,5 +63,47 @@ public class gameDatabaseDao implements gameDao {
 			return td;
 		}
 	}
+
+	@Override
+	public boolean update(game game) {
+
+		final String sql = "UPDATE todo SET " + "finished = ? " + "WHERE id = ?;";
+
+		return jdbcTemplate.update(sql, game.isFinished(), game.getgameId()) > 0;
+	}
+
+	@Transactional
+	@Override
+	public rounds roundadd(rounds rounds, game game) {
+
+		final String INSERT_ROUND = "INSERT INTO round(gameID,guess) VALUES(?,?)";
+
+		int newId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+		game.setgameId(newId);
+
+		jdbcTemplate.update(INSERT_ROUND, game.getgameId(), rounds.getguess());
+
+		return rounds;
+
+	}
+
+	@Override
+	public List<rounds> getALL() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private static final class roundMapper implements RowMapper<rounds> {
+
+		@Override
+		public rounds mapRow(ResultSet rs, int index) throws SQLException {
+			rounds td = new rounds();
+			td.setguess(rs.getInt("guess"));
+			td.setroundId(rs.getInt("roundID"));
+			td.setFinished(rs.getBoolean("isFinished"));
+			return td;
+		}
+	}
+	
 
 }

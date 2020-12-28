@@ -30,9 +30,32 @@ public class game {
 		this.finished = finished;
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public int random(int x) {
 		int random = (int) (Math.random() * 9000) + 1000;
 		return random;
 	}
 
+	public String begin(game game) {
+		return ("Game Begin!! PLACE YOUR GUEST! By passing the guess and gameID in as a JSON--- gameID:" + game.getgameId());
+	}
+
+	public String Checker(game game) {
+		if (game.isFinished() == false) {
+			return ("gameID:" + game.getgameId() + "Finished:False");
+
+		}
+		return ("gameID:" + game.getgameId() + "Finished:True Answer" + game.getanswer());
+
+	}
 }
