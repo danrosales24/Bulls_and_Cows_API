@@ -1,6 +1,5 @@
 package bulls_cows.todoapi.data;
 
-
 import bulls_cows.todoapi.models.game;
 import bulls_cows.todoapi.models.rounds;
 import java.sql.Connection;
@@ -16,6 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Profile("database")
@@ -30,43 +30,36 @@ public class gameDatabaseDao implements gameDao {
 	}
 
 	@Override
+	@Transactional
 	public game add(game game) {
-		String sql = "INSERT INTO actor(first_name,last_name) " + "VALUES(?,?)";
 
-		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+		game.setanswer(game.random(game.getanswer()));
 
-		jdbcTemplate.update((Connection conn) -> {
+		final String INSERT_GAME = "INSERT INTO game(answer) VALUES(?)";
 
-			PreparedStatement statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+		int newId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+		game.setgameId(newId);
 
-			statement.setInt(1, game.getgameId());
-			statement.setInt(2, game.getAnswer());
-			return statement;
-
-		}, keyHolder);
-
-		game.setgameId(keyHolder.getKey().intValue());
-
+		jdbcTemplate.update(INSERT_GAME, game.getanswer());
 		return game;
-
 	}
 
 	@Override
 	public List<game> getAll() {
-		final String sql = "SELECT gameID, answer,finished FROM game;";
+		final String sql = "SELECT gameID,answer,isFinished FROM game;";
 		return jdbcTemplate.query(sql, new gameMapper());
 	}
 
-	 private static final class gameMapper implements RowMapper<game> {
+	private static final class gameMapper implements RowMapper<game> {
 
-	        @Override
-	        public game mapRow(ResultSet rs, int index) throws SQLException {
-	            game td = new game();
-	            td.setgameId(rs.getInt("id"));
-	            td.setanswer(rs.getInt("todo"));
-	            td.setFinished(rs.getBoolean("finished"));
-	            return td;
-	        }
-	    }
-	
+		@Override
+		public game mapRow(ResultSet rs, int index) throws SQLException {
+			game td = new game();
+			td.setgameId(rs.getInt("gameID"));
+			td.setanswer(rs.getInt("answer"));
+			td.setFinished(rs.getBoolean("isFinished"));
+			return td;
+		}
+	}
+
 }

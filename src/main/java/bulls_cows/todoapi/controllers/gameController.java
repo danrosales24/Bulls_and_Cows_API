@@ -1,6 +1,5 @@
 package bulls_cows.todoapi.controllers;
 
-
 import bulls_cows.todoapi.data.gameDao;
 import bulls_cows.todoapi.models.game;
 import java.util.List;
@@ -26,10 +25,18 @@ public class gameController {
 	public gameController(gameDao dao) {
 		this.dao = dao;
 	}
-    @GetMapping
-    public List<game> all() {
-        return dao.getAll();
-    }
-}
-	
 
+	@GetMapping
+	public List<game> all() {
+		return dao.getAll();
+	}
+
+	@PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public game create(game game) {
+    	return dao.add(game);
+   
+
+    }
+
+}

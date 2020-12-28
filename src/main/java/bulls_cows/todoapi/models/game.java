@@ -10,11 +10,11 @@ public class game {
 		return gameID;
 	}
 
-	public void setgameId(int id) {
+	public void setgameId(int gameID) {
 		this.gameID = gameID;
 	}
 
-	public int getAnswer() {
+	public int getanswer() {
 		return answer;
 	}
 
