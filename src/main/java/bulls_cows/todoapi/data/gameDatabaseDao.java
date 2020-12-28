@@ -88,10 +88,11 @@ public class gameDatabaseDao implements gameDao {
 	}
 
 	@Override
-	public List<rounds> getALL() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<rounds> getALL(game game) {
+		final String sql = "SELECT game.gameID,round.roundID,round.guess,round.ts FROM games RIGHT JOIN round ON game.gameID = round.gameID ORDER BY game.gameID;";
+		return jdbcTemplate.query(sql, new roundMapper());
 	}
+	
 	
 	private static final class roundMapper implements RowMapper<rounds> {
 
@@ -100,7 +101,8 @@ public class gameDatabaseDao implements gameDao {
 			rounds td = new rounds();
 			td.setguess(rs.getInt("guess"));
 			td.setroundId(rs.getInt("roundID"));
-			td.setFinished(rs.getBoolean("isFinished"));
+			td.setgameID(rs.getInt("gameID"));
+			td.setts(rs.getString("ts"));
 			return td;
 		}
 	}
