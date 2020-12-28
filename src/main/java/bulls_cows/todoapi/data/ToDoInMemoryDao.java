@@ -5,9 +5,12 @@ import bulls_cows.todoapi.models.ToDo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@Profile("memory")
 public class ToDoInMemoryDao implements ToDoDao {
 
     private static final List<ToDo> todos = new ArrayList<>();
