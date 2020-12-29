@@ -2,11 +2,13 @@ package bulls_cows.todoapi.data;
 
 import bulls_cows.todoapi.models.game;
 import bulls_cows.todoapi.models.rounds;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +51,6 @@ public class gameDatabaseDao implements gameDao {
 	@Override
 	public List<game> getAll() {
 
-	
-		
 		final String sql = "SELECT gameID FROM game;";
 		return jdbcTemplate.query(sql, new gameMapperA());
 	}
@@ -78,53 +78,52 @@ public class gameDatabaseDao implements gameDao {
 	@Transactional
 	@Override
 	public rounds roundadd(rounds rounds) {
+		String guess = String.valueOf(rounds.getguess());
+		int x = rounds.getgameID();
+		game game = findById(x);
+		String Answer = String.valueOf(game.getanswer());
+		int bulls = 0;
+		int cows = 0;
+		int[] arr1 = new int[10];
+		int[] arr2 = new int[10];
 
-		final String sql = "INSERT INTO round(gameID, guess,BullsandCows ) VALUES(?,?, ?);";
+		for (int i = 0; i < Answer.length(); i++) {
+			char c1 = Answer.charAt(i);
+			char c2 = guess.charAt(i);
+
+			if (c1 == c2)
+				bulls++;
+			else {
+				arr1[c1 - '0']++;
+				arr2[c2 - '0']++;
+			}
+		}
+		for (int i = 0; i < 10; i++) {
+			cows += Math.min(arr1[i], arr2[i]);
+		}
+
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		rounds.setBullsandCows("Amount of Bulls " + bulls + " Amount of Cows " + cows);
+		String ts = (String.valueOf(timestamp));
+		rounds.setts(ts);
+
+		final String sql = "INSERT INTO round(gameID, guess,BullsandCows,ts) VALUES(?,?,?,?);";
 		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-
 		jdbcTemplate.update((Connection conn) -> {
 
 			PreparedStatement statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
 			statement.setInt(1, rounds.getgameID());
 			statement.setInt(2, rounds.getguess());
+			statement.setString(3, rounds.getBullsandCows());
+			statement.setString(4, rounds.getts());
+
 			return statement;
 
 		}, keyHolder);
 
 		// rounds.setts();
 		rounds.setroundId(keyHolder.getKey().intValue());
-		String guess =String.valueOf(rounds.getguess());
-		int x = rounds.getgameID();
-		game game = findById(x);
-		String Answer =String.valueOf(game.getanswer());
-		int bulls=0;
-		int cows=0;
-		 int[] arr1 = new int[4];
-		 int[] arr2 = new int[4];
-		
-		   for(int i=0; i<arr1.length; i++){
-		        char c1 = Answer.charAt(i);
-		        char c2 = guess.charAt(i);
-		 
-		        if(c1==c2)
-		            bulls++;
-		        else{
-		            arr1[c1-'0']++;
-		            arr2[c2-'0']++;
-		        }    
-		    }
-		   for(int i=0; i<10; i++){
-		        cows += Math.min(arr1[i], arr2[i]);
-		    }
-		 
-		 
-		   rounds.setBullsandCows ("Amount of Bulls "+bulls+" Amount of Cows "+cows);
-		 
-		
-		
-		
-		
 		return rounds;
 	}
 

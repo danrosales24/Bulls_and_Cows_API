@@ -8,7 +8,7 @@ public class rounds {
 	private String BullsandCows ;
 	
 	
-	public String BullsandCows () {
+	public String getBullsandCows () {
 		return BullsandCows ;
 	}
 
