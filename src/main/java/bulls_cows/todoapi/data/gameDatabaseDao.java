@@ -49,7 +49,7 @@ public class gameDatabaseDao implements gameDao {
 	@Override
 	public List<game> getAll() {
 
-		if()
+	
 		
 		final String sql = "SELECT gameID FROM game;";
 		return jdbcTemplate.query(sql, new gameMapperA());
