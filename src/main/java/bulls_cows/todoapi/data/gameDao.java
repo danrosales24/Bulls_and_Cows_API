@@ -10,16 +10,16 @@ public interface gameDao {
 
     List<game> getAll();
     
-   rounds roundadd(rounds rounds, game game);
+   rounds roundadd(rounds rounds);
     
-    List<rounds> getALL();
+    List<rounds> getALLrounds(game game);
 
     boolean update (game game);
     
-    //rounds findByroundId(int id);
+    game findById(int id);
 
     // true if item exists and is updated
-   // boolean update(game game);
+   String correct(rounds rounds);
 
     // true if item exists and is deleted
    // boolean deleteById(int id);

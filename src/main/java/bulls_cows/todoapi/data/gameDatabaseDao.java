@@ -48,7 +48,7 @@ public class gameDatabaseDao implements gameDao {
 
 	@Override
 	public List<game> getAll() {
-		final String sql = "SELECT gameID,answer,isFinished FROM game WHERE isFinished IS NOT NULL ;";
+		final String sql = "SELECT gameID,isFinished,answer FROM game;";
 		return jdbcTemplate.query(sql, new gameMapper());
 	}
 
@@ -74,26 +74,36 @@ public class gameDatabaseDao implements gameDao {
 
 	@Transactional
 	@Override
-	public rounds roundadd(rounds rounds, game game) {
+	public rounds roundadd(rounds rounds) {
 
-		final String INSERT_ROUND = "INSERT INTO round(gameID,guess) VALUES(?,?)";
+	    final String sql = "INSERT INTO round(gameID, guess) VALUES(?,?);";
+        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
 
-		int newId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
-		game.setgameId(newId);
+        jdbcTemplate.update((Connection conn) -> {
 
-		jdbcTemplate.update(INSERT_ROUND, game.getgameId(), rounds.getguess());
+            PreparedStatement statement = conn.prepareStatement(
+                sql, 
+                Statement.RETURN_GENERATED_KEYS);
 
-		return rounds;
+            statement.setInt(1, rounds.getgameID());
+            statement.setInt(2, rounds.getguess());
+            return statement;
 
+        }, keyHolder);
+
+        rounds.setroundId(keyHolder.getKey().intValue());
+
+        correct(rounds);
+        
+        return rounds;
 	}
 
 	@Override
-	public List<rounds> getALL(game game) {
-		final String sql = "SELECT game.gameID,round.roundID,round.guess,round.ts FROM games RIGHT JOIN round ON game.gameID = round.gameID ORDER BY game.gameID;";
+	public List<rounds> getALLrounds(game game) {
+		final String sql = "SELECT game.gameID,round.roundID,round.guess,round.ts FROM game RIGHT JOIN round ON game.gameID = round.gameID ORDER BY game.gameID;";
 		return jdbcTemplate.query(sql, new roundMapper());
 	}
-	
-	
+
 	private static final class roundMapper implements RowMapper<rounds> {
 
 		@Override
@@ -106,6 +116,32 @@ public class gameDatabaseDao implements gameDao {
 			return td;
 		}
 	}
+
+	@Override
+	public game findById(int id) {
+
+		final String sql = "SELECT gameID, answer, isFinished " + "FROM game WHERE gameID = ?;";
+
+		return jdbcTemplate.queryForObject(sql, new gameMapper(), id);
+	}
+
+	@Override
+	public String correct(rounds rounds) {
+		
+		int x =rounds.getgameID();
+		
+		game game = findById(x);
+		if(game.getanswer()==rounds.getguess()) {
+			return ("WINNNERRRRRRRRRRRRRRRRRRRRR");
+		}else {
+			return ("No good try again");
+		}
+		
+		
+	
+	}
+
+
 	
 
 }
