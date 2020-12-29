@@ -48,11 +48,14 @@ public class gameDatabaseDao implements gameDao {
 
 	@Override
 	public List<game> getAll() {
-		final String sql = "SELECT gameID,isFinished,answer FROM game;";
-		return jdbcTemplate.query(sql, new gameMapper());
+
+		if()
+		
+		final String sql = "SELECT gameID FROM game;";
+		return jdbcTemplate.query(sql, new gameMapperA());
 	}
 
-	private static final class gameMapper implements RowMapper<game> {
+	private static final class gameMapperA implements RowMapper<game> {
 
 		@Override
 		public game mapRow(ResultSet rs, int index) throws SQLException {
@@ -76,26 +79,53 @@ public class gameDatabaseDao implements gameDao {
 	@Override
 	public rounds roundadd(rounds rounds) {
 
-	    final String sql = "INSERT INTO round(gameID, guess) VALUES(?,?);";
-        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+		final String sql = "INSERT INTO round(gameID, guess,BullsandCows ) VALUES(?,?, ?);";
+		GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update((Connection conn) -> {
+		jdbcTemplate.update((Connection conn) -> {
 
-            PreparedStatement statement = conn.prepareStatement(
-                sql, 
-                Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-            statement.setInt(1, rounds.getgameID());
-            statement.setInt(2, rounds.getguess());
-            return statement;
+			statement.setInt(1, rounds.getgameID());
+			statement.setInt(2, rounds.getguess());
+			return statement;
 
-        }, keyHolder);
+		}, keyHolder);
 
-        rounds.setroundId(keyHolder.getKey().intValue());
-
-        correct(rounds);
-        
-        return rounds;
+		// rounds.setts();
+		rounds.setroundId(keyHolder.getKey().intValue());
+		String guess =String.valueOf(rounds.getguess());
+		int x = rounds.getgameID();
+		game game = findById(x);
+		String Answer =String.valueOf(game.getanswer());
+		int bulls=0;
+		int cows=0;
+		 int[] arr1 = new int[4];
+		 int[] arr2 = new int[4];
+		
+		   for(int i=0; i<arr1.length; i++){
+		        char c1 = Answer.charAt(i);
+		        char c2 = guess.charAt(i);
+		 
+		        if(c1==c2)
+		            bulls++;
+		        else{
+		            arr1[c1-'0']++;
+		            arr2[c2-'0']++;
+		        }    
+		    }
+		   for(int i=0; i<10; i++){
+		        cows += Math.min(arr1[i], arr2[i]);
+		    }
+		 
+		 
+		   rounds.setBullsandCows ("Amount of Bulls "+bulls+" Amount of Cows "+cows);
+		 
+		
+		
+		
+		
+		return rounds;
 	}
 
 	@Override
@@ -121,27 +151,21 @@ public class gameDatabaseDao implements gameDao {
 	public game findById(int id) {
 
 		final String sql = "SELECT gameID, answer, isFinished " + "FROM game WHERE gameID = ?;";
-
-		return jdbcTemplate.queryForObject(sql, new gameMapper(), id);
+		return jdbcTemplate.queryForObject(sql, new gameMapperA(), id);
 	}
 
 	@Override
 	public String correct(rounds rounds) {
-		
-		int x =rounds.getgameID();
-		
+
+		int x = rounds.getgameID();
+
 		game game = findById(x);
-		if(game.getanswer()==rounds.getguess()) {
+		if (game.getanswer() == rounds.getguess()) {
 			return ("WINNNERRRRRRRRRRRRRRRRRRRRR");
-		}else {
+		} else {
 			return ("No good try again");
 		}
-		
-		
-	
+
 	}
-
-
-	
 
 }

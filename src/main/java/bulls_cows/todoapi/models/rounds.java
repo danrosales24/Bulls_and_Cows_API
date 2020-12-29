@@ -5,6 +5,17 @@ public class rounds {
 	private int guess;
 	private String ts;
 	private int gameID;
+	private String BullsandCows ;
+	
+	
+	public String BullsandCows () {
+		return BullsandCows ;
+	}
+
+	public void setBullsandCows(String BullsandCows ) {
+		this.BullsandCows  = BullsandCows ;
+	}
+	
 
 	public int getroundId() {
 		return roundID;
