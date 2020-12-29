@@ -50,9 +50,10 @@ public class gameDatabaseDao implements gameDao {
 
 	@Override
 	public List<game> getAll() {
+		final String sql = "SELECT gameID,answer,isFinished FROM game;";
 
-		final String sql = "SELECT gameID FROM game;";
 		return jdbcTemplate.query(sql, new gameMapperA());
+
 	}
 
 	private static final class gameMapperA implements RowMapper<game> {
@@ -63,6 +64,9 @@ public class gameDatabaseDao implements gameDao {
 			td.setgameId(rs.getInt("gameID"));
 			td.setanswer(rs.getInt("answer"));
 			td.setFinished(rs.getBoolean("isFinished"));
+				//if(td.isFinished()==false) {
+					//td.setanswer(0);
+				//}
 			return td;
 		}
 	}
@@ -70,8 +74,7 @@ public class gameDatabaseDao implements gameDao {
 	@Override
 	public boolean update(game game) {
 
-		final String sql = "UPDATE todo SET " + "finished = ? " + "WHERE id = ?;";
-
+		final String sql = "UPDATE game SET " + "isFinished = ? " + "WHERE gameID = ?;";
 		return jdbcTemplate.update(sql, game.isFinished(), game.getgameId()) > 0;
 	}
 
@@ -122,8 +125,12 @@ public class gameDatabaseDao implements gameDao {
 
 		}, keyHolder);
 
-		// rounds.setts();
 		rounds.setroundId(keyHolder.getKey().intValue());
+		if (bulls == 4) {
+			game.setFinished(true);
+			update(game);
+		}
+
 		return rounds;
 	}
 
@@ -151,20 +158,6 @@ public class gameDatabaseDao implements gameDao {
 
 		final String sql = "SELECT gameID, answer, isFinished " + "FROM game WHERE gameID = ?;";
 		return jdbcTemplate.queryForObject(sql, new gameMapperA(), id);
-	}
-
-	@Override
-	public String correct(rounds rounds) {
-
-		int x = rounds.getgameID();
-
-		game game = findById(x);
-		if (game.getanswer() == rounds.getguess()) {
-			return ("WINNNERRRRRRRRRRRRRRRRRRRRR");
-		} else {
-			return ("No good try again");
-		}
-
 	}
 
 }

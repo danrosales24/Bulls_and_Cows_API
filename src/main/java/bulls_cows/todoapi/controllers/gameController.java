@@ -23,7 +23,7 @@ import org.springframework.http.ResponseEntity;
 public class gameController {
 
 	private final gameDao dao;
-	private rounds rounds;
+	
 
 	public gameController(gameDao dao) {
 		this.dao = dao;
@@ -31,7 +31,7 @@ public class gameController {
 
 	@GetMapping
 	public List<game> all() {
-		return dao.getAll();
+	return dao.getAll();
 	}
 
 	@PostMapping("/begin")
@@ -42,7 +42,16 @@ public class gameController {
 	}
 
 	@PostMapping("/guess")
-	public rounds create( @RequestBody rounds rounds) {
+	public rounds create(@RequestBody rounds rounds) {
 		return dao.roundadd(rounds);
+	}
+
+	@GetMapping( "/{id}" )
+	public ResponseEntity<game> findById(@PathVariable int id) {
+		game result = dao.findById(id);
+		if (result == null) {
+			return new ResponseEntity(null, HttpStatus.NOT_FOUND);
+		}
+		return ResponseEntity.ok(result);
 	}
 }

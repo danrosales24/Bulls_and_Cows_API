@@ -6,21 +6,16 @@ import java.util.List;
 
 public interface gameDao {
 
-    String add(game game);
+	String add(game game);
 
-    List<game> getAll();
-    
-   rounds roundadd(rounds rounds);
-    
-    List<rounds> getALLrounds(game game);
+	List<game> getAll();
 
-    boolean update (game game);
-    
-    game findById(int id);
+	rounds roundadd(rounds rounds);
 
-    // true if item exists and is updated
-   String correct(rounds rounds);
+	List<rounds> getALLrounds(game game);
 
-    // true if item exists and is deleted
-   // boolean deleteById(int id);
+	boolean update(game game);
+
+	game findById(int id);
+
 }
